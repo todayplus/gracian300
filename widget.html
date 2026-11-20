@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>오늘의 잠언 · 위젯</title>
+<meta name="theme-color" content="#1f2a44">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-48.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&display=swap">
+<style>
+:root{--bg:linear-gradient(135deg,#1f2a44,#3b2f4e);--text:#fff;--muted:rgba(255,255,255,.75);--gold:#e2b55c;--line:rgba(255,255,255,.18)}
+[data-theme="light"]{--bg:#ffffff;--text:#1d1d1f;--muted:#6b6b70;--gold:#b8862b;--line:#e2ded5}
+[data-theme="dark"]{--bg:#1b1d22;--text:#ececef;--muted:#9a9ba3;--gold:#e2b55c;--line:#2e3139}
+[data-theme="sepia"]{--bg:#faf3e2;--text:#3b2f1e;--muted:#7a6a52;--gold:#a0522d;--line:#dccfb0}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:"Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;word-break:keep-all;background:transparent;display:flex;align-items:center;justify-content:center;padding:var(--pad,10px)}
+body.page{background:#e9e6df;min-height:100vh}
+.w{width:100%;max-width:560px;background:var(--bg);color:var(--text);border-radius:20px;padding:20px 22px 16px;border:1px solid var(--line);box-shadow:0 6px 24px rgba(0,0,0,.12);text-decoration:none;display:block;position:relative;overflow:hidden}
+.lab{font-size:12px;letter-spacing:.08em;color:var(--gold);font-weight:700;display:flex;justify-content:space-between;gap:8px}
+h1{font-family:"Nanum Myeongjo",serif;font-size:clamp(18px,5.4vw,24px);line-height:1.45;margin:6px 0 6px}
+p{margin:0;color:var(--muted);font-size:14px;line-height:1.65}
+.ft{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:11.5px;color:var(--muted)}
+.rf{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:3px 10px;font:inherit;font-size:11.5px;cursor:pointer}
+.small h1{font-size:17px;margin:4px 0 0}.small p,.small .ft{display:none}.small{padding:14px 16px}
+.hint{max-width:560px;margin:14px auto 0;font-size:13px;color:#555;line-height:1.6}
+.hint code{background:#fff;padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<a class="w" id="w" target="_top" href="./"><div class="lab"><span id="lab">오늘의 잠언</span><span id="date"></span></div><h1 id="t">불러오는 중…</h1><p id="d"></p>
+<div class="ft"><span>그라시안의 잠언 300 ↗</span><button class="rf" id="rf" hidden>다른 잠언</button></div></a>
+<script>
+const P=new URLSearchParams(location.search);
+const theme=P.get("theme")||"auto", mode=P.get("mode")||"today", size=P.get("size")||"normal";
+const inFrame=window.self!==window.top;
+let th=theme;if(th==="auto")th=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"brand";
+if(th!=="brand")document.documentElement.dataset.theme=th;
+if(!inFrame&&!P.has("theme"))document.body.classList.add("page");
+if(size==="small")document.getElementById("w").classList.add("small");
+if(P.get("pad"))document.body.style.setProperty("--pad",P.get("pad")+"px");
+function todayNumber(d=new Date()){const seed=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();let h=seed;h=((h^61)^(h>>>16))*9;h^=h>>>4;h=Math.imul(h,0x27d4eb2d);h^=h>>>15;return(Math.abs(h)%300)+1}
+let ALL=[];
+function show(n){const m=ALL[n-1];const d=new Date();
+  document.getElementById("lab").textContent=(mode==="random"?"무작위 잠언":"오늘의 잠언")+` · No.${n}`;
+  document.getElementById("date").textContent=`${d.getMonth()+1}월 ${d.getDate()}일`;
+  document.getElementById("t").textContent=m.t;document.getElementById("d").textContent=m.d;
+  const base=new URL("./",location.href).href;document.getElementById("w").href=`${base}?today=1#${n}`;
+  if(inFrame)document.getElementById("w").target="_blank";
+}
+const pick=()=>mode==="random"?1+Math.floor(Math.random()*300):todayNumber();
+fetch("maxims.json").then(r=>r.json()).then(a=>{ALL=a;show(pick());
+  if(mode==="random"){const b=document.getElementById("rf");b.hidden=false;b.onclick=e=>{e.preventDefault();e.stopPropagation();show(pick())}}
+  // 자정에 자동 갱신
+  const now=new Date(),mid=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,5);setTimeout(()=>location.reload(),mid-now);
+}).catch(()=>{document.getElementById("t").textContent="잠언을 불러오지 못했어요"});
+if("serviceWorker" in navigator&&!inFrame)navigator.serviceWorker.register("sw.js").catch(()=>{});
+if(!inFrame&&!P.has("theme")){document.body.insertAdjacentHTML("beforeend",`<div class="hint" style="position:fixed;bottom:16px;left:16px;right:16px">이 페이지를 홈 화면에 추가하면 '오늘의 잠언' 바로가기 위젯으로 쓸 수 있습니다.<br>옵션: <code>?theme=light|dark|sepia</code> <code>&mode=random</code> <code>&size=small</code></div>`)}
+</script>
+</body>
+</html>

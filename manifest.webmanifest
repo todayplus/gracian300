@@ -1,0 +1,27 @@
+{
+  "name": "그라시안의 잠언 300",
+  "short_name": "잠언 300",
+  "description": "발타사르 그라시안 『신탁과 처세술』 300개 잠언의 해설과 현대적 예시",
+  "id": "./",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#1f2a44",
+  "theme_color": "#1f2a44",
+  "lang": "ko",
+  "dir": "ltr",
+  "categories": ["books", "education", "lifestyle"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "오늘의 잠언", "short_name": "오늘", "url": "./?today=1", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "무작위 잠언", "short_name": "무작위", "url": "./?random=1", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "즐겨찾기", "short_name": "즐겨찾기", "url": "./?favs=1", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "잠언 위젯", "short_name": "위젯", "url": "./widget.html", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
